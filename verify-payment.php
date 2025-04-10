@@ -1,13 +1,15 @@
 <?php
 header("Content-Type: application/json");
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
 
-include_once("../database.php");
+error_reporting(E_ALL); //just for checking error optional
+ini_set("display_errors", 1); //just for checking error optional
+
+include_once("../database.php"); // use mysql database if you want to update payment information pending to success in your table where you store payment 
+//information
 $conn = db();
 
-$keyId = "rzp_test_TlxM6W37t3zETC"; // Replace with your Razorpay Key
-$keySecret = "kWxmCHmtBYxdaLRLEjsT1hQ0";
+$keyId = "Razorpay_key"; // Replace with your Razorpay Key
+$keySecret = "Razorpay_secret_key";
 
 // Read input JSON
 $data = json_decode(file_get_contents("php://input"), true);
@@ -42,21 +44,11 @@ if ($paymentId && $orderId) {
 
     error_log("Razorpay API Error Response: " . json_encode($paymentResponse));
 
-    // Send response as JSON to frontend
-    // header("Content-Type: application/json");
-
-    // echo json_encode([
-    //     "debug" => $paymentResponse,
-    //     "success" => false,
-    //     "message" => "Debugging API response"
-    // ]);
-    // exit;
-
     if (!empty($paymentResponse["status"]) && $paymentResponse["status"] === "captured") {
         // Update database to set status as "success"
-        $stmt = $conn->prepare("UPDATE itr SET status = 'success' WHERE transactionId = ?");
+        $stmt = $conn->prepare("UPDATE table_name SET status = 'success' WHERE transactionId = ?");
         if ($stmt) {
-            $stmt->bind_param("s", $orderId);
+            $stmt->bind_param("s", $orderId); //orderId is you transactionId
             $stmt->execute();
             $stmt->close();
 
