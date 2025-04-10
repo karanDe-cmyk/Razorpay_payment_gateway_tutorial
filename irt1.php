@@ -39,10 +39,11 @@ $response = ["success" => false, "message" => "Invalid request"];
 if (isset($data['amount'])) {
     $amount = intval($data['amount']); // Convert to paise
     $phone = $data['phone'];
+    $unique_id = $data["unique_id"];
 
     // Insert order with "pending" status (NO success yet)
-    $stmt = $conn->prepare("INSERT INTO table_name (phone, amount, transactionId, status) VALUES (?, ?, '', 'pending')");
-    $stmt->bind_param("si", $phone, $amount);
+    $stmt = $conn->prepare("INSERT INTO table_name (user_id, phone, amount, transactionId, status) VALUES (?, ?, ?, '', 'pending')");
+    $stmt->bind_param("ssi", $unique_id, $phone, $amount);
     $stmt->execute();
     $orderId = $stmt->insert_id;
     $stmt->close();
