@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Gateway Tutorial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
@@ -20,6 +21,9 @@
                 <label for="contactNo" class="form-label">Contact Number</label>
                 <input type="text" class="form-control" id="contactNo" name="contactNo" placeholder="Enter Contact Number">
             </div>
+            <div class="mb-3">
+                <input type="text" class="form-control d-none" id="condition" value="<?php echo uniqid(); ?>" name="condition" placeholder="Enter Unique ID">
+            </div>
             <button type="submit" class="btn btn-primary" onclick="processPayment()">Submit</button>
         </form>
     </div>
@@ -29,7 +33,8 @@
             // if you have more input field just get their value and send to your payment page in my situation irt1.php
             let amount = document.getElementById("amount1").value.trim();
             let phone = document.getElementById("contactNo").value.trim();
-
+            let unique_id = document.getElementById("condition").value.trim();
+            
             // Validation checks
             if (!amount || isNaN(amount) || amount <= 0) {
                 alert("Please enter a valid amount.");
@@ -37,6 +42,10 @@
             }
             if (!phone || phone.length !== 10 || isNaN(phone)) {
                 alert("Please enter a valid 10-digit phone number.");
+                return;
+            }
+            if (!unique_id) {
+                alert("Unique ID is required.");
                 return;
             }
 
@@ -49,6 +58,7 @@
                     body: JSON.stringify({
                         amount: amount,
                         phone: phone,
+                        unique_id: unique_id,
                     })
                 })
                 .then(response => response.json())// after payment we get some json data from razorpay which is stored in response
@@ -79,7 +89,7 @@
                                         if (data.success) {
                                             if (data.orderId) {
                                                 alert("Payment Successful!");
-                                                window.location.href = 'thankyou.php';// redirect url after success
+                                                window.location.href = './thankyou.php';// redirect url after success
                                             } else {
                                                 console.error("Error: orderId is missing from API response");
                                                 alert("Error retrieving order ID!");
