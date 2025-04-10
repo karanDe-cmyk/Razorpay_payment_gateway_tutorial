@@ -3,13 +3,13 @@ header("Content-Type: application/json");
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
-include_once("../database.php");
+include_once("../database.php"); //optional if you want to save payment information in database, replace with you database path
 $conn = db();
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$keyId = "rzp_test_TlxM6W37t3zETC"; // Replace with your Razorpay Key
-$keySecret = "kWxmCHmtBYxdaLRLEjsT1hQ0";
+$keyId = "Razorpay_key"; // Replace with your Razorpay Key
+$keySecret = "Razorpay_secret_key";
 
 // Function to make cURL request
 function makeCurlRequest($url, $data = [], $isPost = true)
@@ -39,11 +39,10 @@ $response = ["success" => false, "message" => "Invalid request"];
 if (isset($data['amount'])) {
     $amount = intval($data['amount']); // Convert to paise
     $phone = $data['phone'];
-    $unique_id = $data["unique_id"];
 
     // Insert order with "pending" status (NO success yet)
-    $stmt = $conn->prepare("INSERT INTO itr (user_id, phone, amount, transactionId, status) VALUES (?, ?, ?, '', 'pending')");
-    $stmt->bind_param("ssi", $unique_id, $phone, $amount);
+    $stmt = $conn->prepare("INSERT INTO table_name (phone, amount, transactionId, status) VALUES (?, ?, '', 'pending')");
+    $stmt->bind_param("si", $phone, $amount);
     $stmt->execute();
     $orderId = $stmt->insert_id;
     $stmt->close();
